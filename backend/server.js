@@ -1,3 +1,13 @@
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:");
+  console.error(err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:");
+  console.error(err);
+});
+
 require("dotenv").config();
 
 const express = require("express");
@@ -97,17 +107,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-process.on("uncaughtException", (err) => {
-  console.error("UNCAUGHT EXCEPTION:");
-  console.error(err);
-});
-
-process.on("unhandledRejection", (err) => {
-  console.error("UNHANDLED REJECTION:");
-  console.error(err);
-});
-
 app.use("/uploads", express.static(require("path").join(__dirname, "uploads")));
 
 
