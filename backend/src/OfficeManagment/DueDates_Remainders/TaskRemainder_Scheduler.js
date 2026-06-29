@@ -2,7 +2,7 @@ const cron = require("node-cron");
 const {
   processOverdueTasks,
   processPendingReminders,
-} = require("./Duedates.service");
+} = require("./duedates.service");
 
 let schedulerStarted = false;
 
