@@ -8,7 +8,7 @@ const {
   changeDueDateValidator,
   createReminderValidator,
   updateReminderValidator,
-} = require("./duedates.validator");
+} = require("./Duedates.validator");
 
 router.use(authenticate);
 

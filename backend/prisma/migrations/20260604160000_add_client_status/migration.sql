@@ -1,7 +1,0 @@
-DO $$ BEGIN
-  CREATE TYPE "ClientStatus" AS ENUM ('ACTIVE', 'INACTIVE');
-EXCEPTION
-  WHEN duplicate_object THEN NULL;
-END $$;
-
-ALTER TABLE "Client" ADD COLUMN IF NOT EXISTS "status" "ClientStatus" NOT NULL DEFAULT 'ACTIVE';
