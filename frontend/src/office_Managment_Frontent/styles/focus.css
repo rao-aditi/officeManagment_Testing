@@ -1,0 +1,27 @@
+:root {
+
+  --focus-ring-color: #286782;
+  --focus-ring-strong: #032939;
+  --focus-ring-soft: rgba(3, 41, 57, 0.2);
+}
+
+
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--focus-ring-color);
+  box-shadow: 0 0 0 1px var(--focus-ring-color);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+:where(button, a, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+
+.focus-ring {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}

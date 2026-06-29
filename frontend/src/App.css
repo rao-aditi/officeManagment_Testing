@@ -1,0 +1,258 @@
+@import "tailwindcss";
+@import "./office_Managment_Frontent/styles/focus.css";
+
+html,
+body,
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-brand: hsl(221 83% 53%);
+  --color-header: hsl(198 40% 94%);
+  --color-header-foreground: hsl(220 35% 18%);
+  --color-button: hsl(198 89% 38%);
+  --color-button-hover: hsl(198 89% 32%);
+  --color-button-foreground: #ffffff;
+  --color-success: hsl(142 76% 36%);
+  --color-success-foreground: #ffffff;
+  --color-warning: hsl(38 92% 50%);
+  --color-warning-foreground: hsl(20 14% 4%);
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222 47% 11%);
+  --color-muted: hsl(210 40% 96%);
+  --color-muted-foreground: hsl(215 20% 40%);
+  --color-border: hsl(214 32% 91%);
+  --color-input: hsl(210 40% 98%);
+  --color-input-hover: hsl(210 40% 94%);
+  --color-ring: hsl(215 20% 65%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222 47% 11%);
+  --color-primary: var(--color-brand);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: hsl(0 0% 96%);
+  --color-secondary-foreground: hsl(222 47% 11%);
+  --color-accent: hsl(0 0% 98%);
+  --color-accent-foreground: hsl(222 47% 11%);
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: #ffffff;
+  --color-popover: #ffffff;
+  --color-popover-foreground: hsl(222 47% 11%);
+}
+
+:root {
+  --sidebar-background: #022938;
+  --sidebar-foreground: rgba(255, 255, 255, 0.85);
+  --sidebar-foreground-muted: rgba(255, 255, 255, 0.45);
+  --sidebar-accent: #065273;
+  --sidebar-accent-hover: rgba(11, 131, 183, 0.18);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-white: rgba(11, 131, 183, 0.18);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  .bg-cyanDark {
+    background-color: var(--sidebar-accent);
+  }
+
+  .border-cyanDark {
+    background-color: var(--sidebar-accent);
+  }
+
+  .text-cyanDark {
+    color: var(--sidebar-accent);
+  }
+
+  .bg-card {
+    background-color: var(--color-card);
+    color: var(--color-card-foreground);
+  }
+
+  .bg-card th,
+  .bg-card td {
+    color: var(--color-card-foreground);
+  }
+
+  .bg-popover {
+    background-color: var(--color-header);
+    color: var(--color-header-foreground);
+  }
+
+  .bg-popover-item {
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .bg-popover-item:hover {
+    background-color: color-mix(in hsl, var(--color-brand) 85%, #ffffff);
+  }
+
+  input:hover {
+    background-color: var(--color-input-hover);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--focus-ring-color, var(--color-ring));
+    box-shadow: none;
+  }
+
+  input:focus-visible {
+    outline: none;
+    border-color: var(--focus-ring-color, var(--color-ring));
+    box-shadow: 0 0 0 1px var(--focus-ring-color, var(--color-ring));
+  }
+
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px var(--color-input) inset;
+    -webkit-text-fill-color: var(--color-foreground);
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input:-moz-autofill {
+    box-shadow: 0 0 0px 1000px var(--color-input) inset;
+    -moz-text-fill-color: var(--color-foreground);
+  }
+}
+
+.right-shortcuts,
+.right-shortcuts * {
+  pointer-events: none;
+  outline: none !important;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.kbd {
+  padding: 2px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #f9fafb;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.select-placeholder:has(option:checked[data-placeholder]) {
+  color: var(--color-muted-foreground);
+}
+
+.select-placeholder:has(option:checked[data-placeholder]) option {
+  color: var(--color-foreground);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes navloader {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes dotBlink {
+
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes bell-shake {
+  0% {
+    transform: rotate(0) translateY(0);
+  }
+
+  20% {
+    transform: rotate(-15deg) translateY(-2px);
+  }
+
+  40% {
+    transform: rotate(15deg) translateY(-2px);
+  }
+
+  60% {
+    transform: rotate(-10deg) translateY(-1px);
+  }
+
+  80% {
+    transform: rotate(10deg) translateY(-1px);
+  }
+
+  100% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+}
+
+.icon-shake {
+  display: inline-block;
+  transform-origin: top center;
+}
+
+.group:hover .icon-shake {
+  animation: bell-shake 0.6s ease-in-out;
+}
+
+.dialog-form-container input,
+.dialog-form-container textarea,
+.dialog-form-container select {
+  @apply border-gray-300;
+}

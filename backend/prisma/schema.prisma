@@ -1,0 +1,1032 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                      String               @id @default(uuid())
+  name                    String
+  email                   String               @unique
+  phone                   String?              @unique
+  password                String
+  roleId                  String?
+  status                  UserStatus           @default(ACTIVE)
+  createdBy               String?
+  teamLeaderId            String?
+  lastLoginAt             DateTime?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  clientIds               Int[]                @default([])
+  googleDriveAccessToken  String?
+  googleDriveConnected    Boolean              @default(false)
+  googleDriveEmail        String?
+  googleDriveFolderId     String?
+  googleDriveRefreshToken String?
+  googleDriveTokenExpiry  DateTime?
+  documentsUploaded       Document[]           @relation("DocumentUploader")
+  GSTUserProfile          GSTUserProfile?
+  passwordResetTokens     PasswordResetToken[]
+  quotationsCreated       Quotation[]          @relation("QuotationCreator")
+  refreshTokens           RefreshToken[]
+  SoftwareAccess          SoftwareAccess[]
+  tasksCreated            Task[]               @relation("TaskAssigner")
+  tasksAssigned           Task[]               @relation("TaskAssignee")
+  checklistCompleted      TaskChecklist[]      @relation("ChecklistCompletedBy")
+  remindersCreated        TaskReminder[]       @relation("TaskReminderCreatedBy")
+  taskReminders           TaskReminder[]       @relation("TaskReminderUser")
+  taskStatusChanges       TaskStatusHistory[]
+  roleRef                 Role?                @relation(fields: [roleId], references: [id])
+  teamLeader              User?                @relation("TeamMembers", fields: [teamLeaderId], references: [id])
+  teamMembers             User[]               @relation("TeamMembers")
+
+  @@index([roleId])
+  @@index([teamLeaderId])
+  @@index([status])
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+  users           User[]
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  key             String           @unique
+  description     String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model Task {
+  id               String              @id @default(uuid())
+  clientId         String
+  title            String
+  assignedToId     String?
+  assignedById     String
+  priority         TaskPriority        @default(MEDIUM)
+  status           TaskStatus          @default(DRAFT)
+  dueDate          DateTime?
+  completedAt      DateTime?
+  requiresApproval Boolean             @default(true)
+  remarks          String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  client_Id        Int?
+  serviceTypeId    Int?
+  taskType         TaskType            @default(GST)
+  documents        Document[]
+  invoices         Invoice[]
+  quotations       Quotation[]
+  assignedBy       User                @relation("TaskAssigner", fields: [assignedById], references: [id])
+  assignedTo       User?               @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  client           Client?             @relation(fields: [client_Id], references: [id])
+  serviceType      ServiceType?        @relation(fields: [serviceTypeId], references: [id])
+  checklist        TaskChecklist[]
+  reminders        TaskReminder[]
+  statusHistory    TaskStatusHistory[]
+
+  @@index([clientId])
+  @@index([assignedToId])
+  @@index([assignedById])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model TaskChecklist {
+  id            String    @id @default(uuid())
+  taskId        String
+  title         String
+  isCompleted   Boolean   @default(false)
+  completedById String?
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  completedBy   User?     @relation("ChecklistCompletedBy", fields: [completedById], references: [id])
+  task          Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([isCompleted])
+}
+
+model TaskReminder {
+  id           String         @id @default(uuid())
+  taskId       String
+  userId       String
+  remindAt     DateTime
+  reminderType String?
+  message      String?
+  status       ReminderStatus @default(PENDING)
+  sentAt       DateTime?
+  error        String?
+  isActive     Boolean        @default(true)
+  createdById  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  createdBy    User?          @relation("TaskReminderCreatedBy", fields: [createdById], references: [id])
+  task         Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user         User           @relation("TaskReminderUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([remindAt])
+  @@index([status])
+}
+
+model TaskStatusHistory {
+  id          String      @id @default(uuid())
+  taskId      String
+  fromStatus  TaskStatus?
+  toStatus    TaskStatus
+  changedById String
+  remarks     String?
+  createdAt   DateTime    @default(now())
+  changedBy   User        @relation(fields: [changedById], references: [id])
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([changedById])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Client {
+  id                           Int                   @id @default(autoincrement())
+  code                         String?               @unique
+  group                        String?
+  entityType                   EntityType
+  prefix                       String?
+  name                         String
+  dateOfDeed                   DateTime?
+  dateOfFormation              DateTime?
+  dateOfIncorporation          DateTime?
+  firstName                    String?
+  middleName                   String?
+  lastName                     String?
+  fatherName                   String?
+  spouseName                   String?
+  qualification                String?
+  nationality                  String?
+  occupation                   String?
+  uinNo                        String?
+  nameAsPerUIN                 String?
+  mobileLinkedWithUIN          String?
+  passportStatus               PassportStatus?
+  passportNumber               String?
+  gender                       Gender?
+  votersId                     String?
+  dob                          DateTime?
+  dod                          DateTime?
+  residentialStatus            ResidentialStatus?
+  pan                          String?
+  tan                          String?
+  din                          String?
+  dateOfCommencementOfBusiness DateTime?
+  isFIIFPI                     FIIFPIStatus?
+  sebiRegnNo                   String?
+  isMSME                       MSMEStatus?
+  msmeRegistrationNo           String?
+  msmeRegistrationDate         DateTime?
+  enterpriseType               EnterpriseType?
+  majorActivity                MajorActivity?
+  businessName                 String?
+  contactPerson                String?
+  natureOfBusiness             NatureOfBusiness?
+  stockValuationMethod         StockValuationMethod?
+  gstNo                        String?
+  gstStartDate                 DateTime?
+  gstEndDate                   DateTime?
+  vatRegNo                     String?
+  centralSalesTaxNo            String?
+  serviceTaxRegNo              String?
+  otherRegistration            String?
+  isLLP                        Boolean               @default(false)
+  llpId                        String?
+  oldCompanyName               String?
+  registrarOfCompanyId         Int?
+  cin                          String?
+  gln                          String?
+  companyCategory              CompanyCategoryPrime?
+  companySub                   CompanySub?
+  companyCategoryOtherSpecify  String?
+  sec8LicenceNo                String?
+  companyType                  CompanyType?
+  havingShareCapital           Boolean?
+  isPrivateOnePersonCompany    Boolean               @default(false)
+  createdAt                    DateTime              @default(now())
+  updatedAt                    DateTime              @updatedAt
+  status                       ClientStatus          @default(ACTIVE)
+  assignToGST                  Boolean               @default(false)
+  assignToIT                   Boolean               @default(false)
+  assignToPayroll              Boolean               @default(false)
+  assignToROC                  Boolean               @default(false)
+  assignToTDS                  Boolean               @default(false)
+  gstAssignedAt                DateTime?
+  gstAssignedBy                String?
+  tdsAssignedAt                DateTime?
+  tdsAssignedBy                String?
+  RegistrarOfCompany           RegistrarOfCompany?   @relation(fields: [registrarOfCompanyId], references: [id])
+  documents                    Document[]
+  GSTClient                    GSTClient[]
+  invoices                     Invoice[]
+  quotationClients             QuotationClient[]
+  SigningPerson                SigningPerson?
+  tasks                        Task[]
+
+  @@index([entityType])
+  @@index([pan])
+}
+
+model ServiceType {
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
+  serviceCharges  Decimal           @db.Decimal(12, 2)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  discountAllowed Boolean           @default(false)
+  status          ServiceTypeStatus @default(ACTIVE)
+  taxRate         Decimal           @default(0) @db.Decimal(5, 2)
+  couponCode      String?
+  invoices        Invoice[]
+  quotations      Quotation[]
+  tasks           Task[]
+}
+
+model RegistrarOfCompany {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  Client Client[]
+}
+
+model SigningPerson {
+  id          Int       @id @default(autoincrement())
+  clientId    Int       @unique
+  name        String
+  fatherName  String?
+  designation String?
+  gender      Gender?
+  panNo       String?
+  dob         DateTime?
+  Client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model GSTClient {
+  id                      String                    @id
+  clientId                Int
+  gstin                   String                    @unique
+  legalName               String
+  tradeName               String?
+  pan                     String
+  stateCode               String
+  registrationType        RegistrationType
+  businessType            BusinessType
+  principalAddress        String
+  contactEmail            String
+  contactMobile           String
+  constitution            String?
+  registrationDate        DateTime
+  cancellationDate        DateTime?
+  eInvoiceApplicable      Boolean                   @default(false)
+  qrmpStatus              Boolean                   @default(false)
+  isActive                Boolean                   @default(true)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime
+  Client                  Client                    @relation(fields: [clientId], references: [id])
+  GSTReturn               GSTReturn[]
+  GSTTask                 GSTTask[]
+  GSTUserClientAssignment GSTUserClientAssignment[]
+  ITCRecord               ITCRecord[]
+  OutwardSupply           OutwardSupply[]
+  TaxPayment              TaxPayment[]
+
+  @@unique([clientId, gstin])
+  @@index([gstin])
+  @@index([stateCode])
+}
+
+model GSTR3B {
+  id                   String        @id
+  returnId             String        @unique
+  totalTaxableValue    Decimal       @db.Decimal(15, 2)
+  outwardSuppliesRates Json
+  interStateValue      Decimal       @db.Decimal(15, 2)
+  interStateIgst       Decimal       @db.Decimal(15, 2)
+  itcAvailable         Decimal       @db.Decimal(15, 2)
+  itcOnInputs          Decimal       @db.Decimal(15, 2)
+  itcOnInputServices   Decimal       @db.Decimal(15, 2)
+  itcOnCapitalGoods    Decimal       @db.Decimal(15, 2)
+  itcReversed          Decimal       @default(0) @db.Decimal(15, 2)
+  reversalReason       String?
+  imsAcceptedItc       Decimal       @default(0) @db.Decimal(15, 2)
+  imsRejectedItc       Decimal       @default(0) @db.Decimal(15, 2)
+  imsPendingItc        Decimal       @default(0) @db.Decimal(15, 2)
+  netCgstPayable       Decimal       @db.Decimal(15, 2)
+  netSgstPayable       Decimal       @db.Decimal(15, 2)
+  netIgstPayable       Decimal       @db.Decimal(15, 2)
+  netCessPayable       Decimal       @db.Decimal(15, 2)
+  interestAmount       Decimal       @default(0) @db.Decimal(15, 2)
+  interestDays         Int           @default(0)
+  lateFeeCgst          Decimal       @default(0) @db.Decimal(15, 2)
+  lateFeeSgst          Decimal       @default(0) @db.Decimal(15, 2)
+  lateFeeDays          Int           @default(0)
+  cashCgst             Decimal       @default(0) @db.Decimal(15, 2)
+  cashSgst             Decimal       @default(0) @db.Decimal(15, 2)
+  cashIgst             Decimal       @default(0) @db.Decimal(15, 2)
+  cashCess             Decimal       @default(0) @db.Decimal(15, 2)
+  itcUtilizedCgst      Decimal       @default(0) @db.Decimal(15, 2)
+  itcUtilizedSgst      Decimal       @default(0) @db.Decimal(15, 2)
+  itcUtilizedIgst      Decimal       @default(0) @db.Decimal(15, 2)
+  filedVia             FilingMethod?
+  digitalSignatureHash String?
+  ipAddress            String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime
+  GSTReturn            GSTReturn     @relation(fields: [returnId], references: [id])
+}
+
+model GSTReturn {
+  id            String          @id
+  gstClientId   String
+  taskId        String?         @unique
+  financialYear String
+  period        String
+  periodType    PeriodType
+  returnType    ReturnType
+  status        ReturnStatus    @default(DRAFT)
+  filingDate    DateTime?
+  arn           String?
+  isLocked      Boolean         @default(false)
+  lockedAt      DateTime?
+  lockedBy      String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  GSTR3B        GSTR3B?
+  GSTClient     GSTClient       @relation(fields: [gstClientId], references: [id])
+  GSTTask       GSTTask?        @relation(fields: [taskId], references: [id])
+  ITCRecord     ITCRecord[]
+  OutwardSupply OutwardSupply[]
+  TaxPayment    TaxPayment[]
+
+  @@unique([gstClientId, financialYear, period, returnType])
+  @@index([status])
+}
+
+model GSTTask {
+  id                                                  String          @id
+  gstClientId                                         String
+  title                                               String
+  period                                              String
+  financialYear                                       String
+  returnType                                          ReturnType
+  assignedToId                                        String?
+  reviewerId                                          String?
+  status                                              GSTTaskStatus   @default(DRAFT)
+  dueDate                                             DateTime?
+  submittedAt                                         DateTime?
+  reviewedAt                                          DateTime?
+  approvedAt                                          DateTime?
+  filedAt                                             DateTime?
+  makerRemarks                                        String?
+  reviewerRemarks                                     String?
+  approverRemarks                                     String?
+  createdAt                                           DateTime        @default(now())
+  updatedAt                                           DateTime
+  GSTReturn                                           GSTReturn?
+  GSTUserProfile_GSTTask_assignedToIdToGSTUserProfile GSTUserProfile? @relation("GSTTask_assignedToIdToGSTUserProfile", fields: [assignedToId], references: [id])
+  GSTClient                                           GSTClient       @relation(fields: [gstClientId], references: [id])
+  GSTUserProfile_GSTTask_reviewerIdToGSTUserProfile   GSTUserProfile? @relation("GSTTask_reviewerIdToGSTUserProfile", fields: [reviewerId], references: [id])
+
+  @@index([assignedToId])
+  @@index([gstClientId])
+  @@index([reviewerId])
+  @@index([status])
+}
+
+model GSTUserClientAssignment {
+  id             String         @id
+  gstUserId      String
+  gstClientId    String
+  assignedBy     String?
+  assignedAt     DateTime       @default(now())
+  isActive       Boolean        @default(true)
+  GSTClient      GSTClient      @relation(fields: [gstClientId], references: [id], onDelete: Cascade)
+  GSTUserProfile GSTUserProfile @relation(fields: [gstUserId], references: [id], onDelete: Cascade)
+
+  @@unique([gstUserId, gstClientId])
+  @@index([gstClientId])
+  @@index([gstUserId])
+}
+
+model GSTUserProfile {
+  id                                           String                    @id
+  userId                                       String                    @unique
+  gstRole                                      GSTRole                   @default(STAFF)
+  canView                                      Boolean                   @default(true)
+  canEdit                                      Boolean                   @default(false)
+  canCreate                                    Boolean                   @default(false)
+  canReview                                    Boolean                   @default(false)
+  canApprove                                   Boolean                   @default(false)
+  canFile                                      Boolean                   @default(false)
+  isActive                                     Boolean                   @default(true)
+  createdAt                                    DateTime                  @default(now())
+  updatedAt                                    DateTime
+  GSTTask_GSTTask_assignedToIdToGSTUserProfile GSTTask[]                 @relation("GSTTask_assignedToIdToGSTUserProfile")
+  GSTTask_GSTTask_reviewerIdToGSTUserProfile   GSTTask[]                 @relation("GSTTask_reviewerIdToGSTUserProfile")
+  GSTUserClientAssignment                      GSTUserClientAssignment[]
+  User                                         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([gstRole])
+}
+
+model ITCRecord {
+  id             String     @id
+  gstClientId    String
+  returnId       String?
+  supplierGstin  String
+  supplierName   String?
+  invoiceNo      String
+  invoiceDate    DateTime
+  invoiceValue   Decimal    @db.Decimal(15, 2)
+  eligibleItc    Decimal    @db.Decimal(15, 2)
+  itcType        ItcType    @default(INPUT)
+  imsStatus      ImsStatus  @default(PENDING)
+  isReversed     Boolean    @default(false)
+  reversalDate   DateTime?
+  reversalReason String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime
+  GSTClient      GSTClient  @relation(fields: [gstClientId], references: [id])
+  GSTReturn      GSTReturn? @relation(fields: [returnId], references: [id])
+
+  @@index([gstClientId])
+  @@index([supplierGstin])
+}
+
+model OutwardSupply {
+  id               String     @id
+  returnId         String
+  gstClientId      String
+  supplyType       SupplyType
+  invoiceNo        String
+  invoiceDate      DateTime
+  invoiceValue     Decimal    @db.Decimal(15, 2)
+  buyerGstin       String?
+  buyerStateCode   String?
+  buyerName        String?
+  taxableValue     Decimal    @db.Decimal(15, 2)
+  taxRate          Decimal    @db.Decimal(5, 2)
+  cgst             Decimal    @db.Decimal(15, 2)
+  sgst             Decimal    @db.Decimal(15, 2)
+  igst             Decimal    @db.Decimal(15, 2)
+  cess             Decimal    @default(0) @db.Decimal(15, 2)
+  hsnCode          String?
+  hsnDescription   String?
+  quantity         Decimal?   @db.Decimal(12, 3)
+  unitOfMeasure    String?
+  isAmendment      Boolean    @default(false)
+  originalSupplyId String?
+  amendmentReason  String?
+  einvoiceIrn      String?
+  einvoiceAckNo    String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime
+  GSTClient        GSTClient  @relation(fields: [gstClientId], references: [id])
+  GSTReturn        GSTReturn  @relation(fields: [returnId], references: [id])
+
+  @@index([returnId])
+  @@index([supplyType])
+}
+
+model SoftwareAccess {
+  id        String       @id
+  userId    String
+  software  SoftwareType
+  isActive  Boolean      @default(true)
+  grantedBy String?
+  grantedAt DateTime     @default(now())
+  revokedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime
+  User      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, software])
+  @@index([software])
+  @@index([userId])
+}
+
+model TaxPayment {
+  id              String        @id
+  gstClientId     String
+  returnId        String
+  challanNo       String        @unique
+  amount          Decimal       @db.Decimal(15, 2)
+  paymentType     PaymentType   @default(CASH)
+  cgstAmount      Decimal       @default(0) @db.Decimal(15, 2)
+  sgstAmount      Decimal       @default(0) @db.Decimal(15, 2)
+  igstAmount      Decimal       @default(0) @db.Decimal(15, 2)
+  cessAmount      Decimal       @default(0) @db.Decimal(15, 2)
+  paymentDate     DateTime
+  bankReferenceNo String?
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime
+  GSTClient       GSTClient     @relation(fields: [gstClientId], references: [id])
+  GSTReturn       GSTReturn     @relation(fields: [returnId], references: [id])
+
+  @@index([challanNo])
+}
+
+model DocumentType {
+  id             String            @id @default(uuid())
+  name           String            @unique
+  frequencyTypes FrequencyType[]
+  status         ServiceTypeStatus @default(ACTIVE)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  documents      Document[]
+
+  @@index([status])
+}
+
+model Quotation {
+  id             String            @id @default(uuid())
+  quotationNo    String            @unique
+  serviceTypeId  Int
+  serviceCharges Decimal           @db.Decimal(12, 2)
+  taxRate        Decimal           @db.Decimal(5, 2)
+  discountAmount Decimal           @default(0) @db.Decimal(12, 2)
+  finalAmount    Decimal           @db.Decimal(12, 2)
+  status         QuotationStatus   @default(DRAFT)
+  createdBy      String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  quotationDate  DateTime          @default(now())
+  taskId         String?
+  invoices       Invoice?
+  creator        User              @relation("QuotationCreator", fields: [createdBy], references: [id])
+  serviceType    ServiceType       @relation(fields: [serviceTypeId], references: [id])
+  task           Task?             @relation(fields: [taskId], references: [id])
+  clients        QuotationClient[]
+
+  @@index([taskId])
+  @@index([serviceTypeId])
+  @@index([status])
+  @@index([createdBy])
+}
+
+model QuotationClient {
+  quotationId String
+  clientId    Int
+  client      Client    @relation(fields: [clientId], references: [id])
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+
+  @@id([quotationId, clientId])
+  @@index([clientId])
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  invoiceNo      String        @unique
+  clientId       Int
+  taskId         String?
+  quotationId    String?       @unique
+  total          Decimal       @db.Decimal(12, 2)
+  status         InvoiceStatus @default(DRAFT)
+  pdfUrl         String?
+  issuedAt       DateTime
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  createdBy      String?
+  discountAmount Decimal       @default(0) @db.Decimal(12, 2)
+  serviceCharges Decimal       @default(0) @db.Decimal(12, 2)
+  serviceTypeId  Int?
+  taxRate        Decimal       @default(0) @db.Decimal(5, 2)
+  client         Client        @relation(fields: [clientId], references: [id])
+  quotation      Quotation?    @relation(fields: [quotationId], references: [id])
+  serviceType    ServiceType?  @relation(fields: [serviceTypeId], references: [id])
+  task           Task?         @relation(fields: [taskId], references: [id])
+  payments       Payment[]
+
+  @@index([clientId])
+  @@index([taskId])
+  @@index([status])
+  @@index([serviceTypeId])
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  invoiceId   String
+  amountPaid  Decimal       @db.Decimal(12, 2)
+  paymentDate DateTime
+  mode        PaymentMode
+  referenceNo String?
+  status      PaymentStatus @default(SUCCESS)
+  createdAt   DateTime      @default(now())
+  invoice     Invoice       @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@index([paymentDate])
+}
+
+model Document {
+  id             String         @id @default(uuid())
+  name           String
+  originalName   String
+  filePath       String?
+  fileSize       Int
+  mimeType       String
+  description    String?
+  clientId       Int?
+  taskId         String?
+  uploadedById   String
+  isDeleted      Boolean        @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  documentTypeId String?
+  driveFileId    String?
+  driveUrl       String?
+  frequencyType  FrequencyType[]
+  client         Client?        @relation(fields: [clientId], references: [id])
+  documentType   DocumentType?  @relation(fields: [documentTypeId], references: [id])
+  task           Task?          @relation(fields: [taskId], references: [id])
+  uploadedBy     User           @relation("DocumentUploader", fields: [uploadedById], references: [id])
+
+  @@index([documentTypeId])
+  @@index([clientId])
+  @@index([taskId])
+  @@index([uploadedById])
+  @@index([isDeleted])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TaskStatus {
+  DRAFT
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum CompanyCategoryPrime {
+  LIMITED_BY_SHARES
+  LIMITED_BY_MEMBERS
+  LIMITED_BY_GUARANTOR
+  UNLIMITED_COMPANY
+}
+
+enum CompanySub {
+  UNION_GOVERNMENT_COMPANY
+  STATE_GOVERNMENT_COMPANY
+  INDIAN_NON_GOVERNMENT_COMPANY
+  SUBSIDIARY_OF_FOREIGN_COMPANY
+  COMPANY_LICENSED_UNDER_SECTION_25
+  GUARANTEE_AND_ASSOCIATION_COMPANY
+  OTHERS
+}
+
+enum CompanyType {
+  NEW
+  PRODUCER
+  SECTION_8_COMPANY
+  PART_I_COMPANY_CHAPTER_XXI
+}
+
+enum EnterpriseType {
+  MICRO
+  SMALL
+  MEDIUM
+}
+
+enum EntityType {
+  INDIVIDUAL
+  FIRM
+  AOP
+  AOP_TRUST
+  BODY_OF_INDIVIDUAL
+  ARTIFICIAL_JUDICIAL_PERSON
+  COOPERATIVE_SOCIETY
+  HUF
+  COMPANY_PUBLIC_INTERESTED
+  COMPANY_PUBLIC_NOT_INTERESTED
+  COMPANY_PRIVATE
+  LOCAL_AUTHORITY
+}
+
+enum FIIFPIStatus {
+  YES
+  NO
+}
+
+enum MSMEStatus {
+  YES
+  NO
+}
+
+enum MajorActivity {
+  MANUFACTURING
+  SERVICES
+  TRADING
+}
+
+enum NatureOfBusiness {
+  EXPORT
+  MANUFACTURING
+  MANUFACTURING_AND_TRADING
+  RETAIL_TRADING
+  WHOLESALE_BUSINESS
+  WHOLESALE_CUM_RETAIL
+  CONSTRUCTION_BUSINESS
+  SERVICE_PROVIDER
+  FINANCING_SERVICES
+  SHARES_AND_BROKERAGE
+  IMPORT
+  LESSOR
+  LESSEE
+  WORK_CONTRACTOR
+}
+
+enum PassportStatus {
+  YES
+  NO
+  NA
+}
+
+enum ResidentialStatus {
+  RESIDENT
+  NON_RESIDENT
+  NOT_ORDINARILY_RESIDENT
+}
+
+enum StockValuationMethod {
+  COST_PRICE
+  MARKET_PRICE
+  AVERAGE_COST_METHOD
+  COST_OR_MARKET_WHICHEVER_LESS
+  FIFO
+  LIFO
+}
+
+enum BusinessType {
+  PROPRIETORSHIP
+  PARTNERSHIP
+  PRIVATE_LIMITED
+  PUBLIC_LIMITED
+  LLP
+  TRUST
+  SOCIETY
+  HUF
+}
+
+enum FilingMethod {
+  EVC
+  DSC
+}
+
+enum GSTRole {
+  STAFF
+  REVIEWER
+}
+
+enum GSTTaskStatus {
+  DRAFT
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  REVIEWED
+  APPROVED
+  REJECTED
+  FILED
+  COMPLETED
+}
+
+enum ImsStatus {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
+
+enum ItcType {
+  INPUT
+  INPUT_SERVICE
+  CAPITAL_GOODS
+}
+
+enum PaymentStatus {
+  INITIATED
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum PaymentType {
+  CASH
+  ITC_UTILIZATION
+}
+
+enum PeriodType {
+  MONTHLY
+  QUARTERLY
+}
+
+enum RegistrationType {
+  REGULAR
+  COMPOSITION
+  CASUAL_TAXABLE
+  NON_RESIDENT
+}
+
+enum ReturnStatus {
+  DRAFT
+  READY_FOR_REVIEW
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  FILED
+  FILING_FAILED
+  LOCKED
+}
+
+enum ReturnType {
+  GSTR1
+  GSTR3B
+  GSTR2B
+  IFF
+  GSTR7
+  GSTR9
+}
+
+enum SoftwareType {
+  GST
+  TDS
+  INCOME_TAX
+  ROC
+  PAYROLL
+  BALANCE_SHEET
+  DMS
+  XBRL
+  CMA
+  SFT
+  BILLING
+  OFFICE_MANAGEMENT
+  VAT
+  SERVICE_TAX
+  CLOUD_STORAGE
+  FORM_26AS
+  BANK_RECONCILIATION
+}
+
+enum SupplyType {
+  B2B
+  B2CL
+  B2CS
+  CDNR
+  CDNUR
+  EXPORT
+  ADVANCE
+  NIL_EXEMPT
+}
+
+enum TaskType {
+  GST
+  ITR
+  AUDIT
+  TDS
+  ROC_MCA
+  ACCOUNTING
+  NOTICE_REPLY
+  CUSTOM
+}
+
+enum ServiceTypeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  PARTIALLY_PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  BANK_TRANSFER
+  CHEQUE
+  CARD
+}
+
+enum FrequencyType {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  ONE_TIME
+}
