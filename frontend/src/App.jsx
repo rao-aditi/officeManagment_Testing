@@ -12,13 +12,13 @@ import MasterDataPage from "./gst_Frontend/pages/MasterDataPage";
 export default function App() {
   return (
     <>
-      <BrowserRouter>
+      {/* <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/module/:moduleId" element={<ModulePage />} />
           <Route path="/master-data" element={<MasterDataPage />} />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter> */}
  
       <ThemeProvider>
         <AlertProvider>
