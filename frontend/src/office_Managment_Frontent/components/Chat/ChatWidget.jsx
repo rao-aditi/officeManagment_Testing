@@ -14,6 +14,11 @@ const API_BASE =
 const SOCKET_URL =
     import.meta.env.VITE_SOCKET_URL || "https://chatbot-app-t7b7.onrender.com";
 
+console.log("VITE_SERVER_URL:", import.meta.env.VITE_SERVER_URL);
+console.log("VITE_SOCKET_URL:", import.meta.env.VITE_SOCKET_URL);
+console.log("API_BASE:", API_BASE);
+console.log("MODE:", import.meta.env.MODE);
+
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
