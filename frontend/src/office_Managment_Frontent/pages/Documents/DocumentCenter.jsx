@@ -39,6 +39,7 @@ import {
   createPreviewObjectUrl,
   isInlinePreviewable,
 } from "../../helpers/documentPreview";
+import Button from "../../components/ui/Button";
 
 const DOCUMENT_COLUMNS = [
   { id: "document", label: "Document", minWidth: "220px", enabled: true },
@@ -85,19 +86,19 @@ const DeleteConfirmModal = ({ isOpen, onClose, doc, onConfirm, deleting }) => (
         This action cannot be undone.
       </p>
       <div className="flex justify-end gap-3">
-        <button
+        <Button
+          variant="outline"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="danger-outline"
           onClick={onConfirm}
           disabled={deleting}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-60 flex items-center gap-2"
         >
           {deleting ? "Deleting..." : <><Trash2 size={14} /> Delete</>}
-        </button>
+        </Button>
       </div>
     </div>
   </Modal>

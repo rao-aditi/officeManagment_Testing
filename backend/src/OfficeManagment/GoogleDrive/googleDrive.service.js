@@ -278,10 +278,10 @@ const uploadFileToDrive = async (
 
   const targetFolderId = subFolderName
     ? await ensureSubFolder(
-        drive,
-        categoryFolderId,
-        sanitizeFolderName(subFolderName)
-      )
+      drive,
+      categoryFolderId,
+      sanitizeFolderName(subFolderName)
+    )
     : categoryFolderId;
 
   const file = await drive.files.create({
@@ -327,6 +327,23 @@ const deleteFileFromDrive = async (userId, driveFileId) => {
   }
 };
 
+const listDriveFiles = async (userId) => {
+  const { oauth2Client } = await getAuthenticatedClient(userId);
+
+  const drive = google.drive({
+    version: "v3",
+    auth: oauth2Client,
+  });
+
+  const response = await drive.files.list({
+    q: "trashed=false",
+    fields: "files(id,name)",
+    pageSize: 1000,
+  });
+
+  return response.data.files;
+};
+
 module.exports = {
   getAuthUrl,
   handleOAuthCallback,
@@ -336,4 +353,5 @@ module.exports = {
   uploadFileToDrive,
   downloadFileFromDrive,
   deleteFileFromDrive,
+  listDriveFiles,
 };

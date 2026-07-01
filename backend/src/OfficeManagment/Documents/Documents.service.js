@@ -37,6 +37,7 @@ const documentSelect = {
 };
 
 async function listDocuments({
+  userId,
   page = 1,
   limit = 20,
   documentTypeId,
@@ -44,7 +45,6 @@ async function listDocuments({
   taskId,
   search,
 }) {
-  const where = { isDeleted: false };
 
   if (documentTypeId) where.documentTypeId = documentTypeId;
   if (clientId) where.clientId = parseInt(clientId, 10);
@@ -71,20 +71,100 @@ async function listDocuments({
     ];
   }
 
+  const driveFiles = await googleDriveService.listDriveFiles(userId);
+
+  const driveFileIds = driveFiles.map(file => file.id);
+
+  const where = {
+    isDeleted: false,
+    driveFileId: {
+      in: driveFileIds,
+    },
+  };
+
+  if (documentTypeId) {
+    where.documentTypeId = documentTypeId;
+  }
+
+  if (clientId) {
+    where.clientId = parseInt(clientId, 10);
+  }
+
+  if (taskId) {
+    where.taskId = taskId;
+  }
+
+  if (search) {
+    where.OR = [
+      {
+        originalName: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        documentType: {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        client: {
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              businessName: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
+      },
+    ];
+  }
+
   const skip = (page - 1) * limit;
 
   const [documents, total] = await Promise.all([
     prisma.document.findMany({
       where,
       select: documentSelect,
-      orderBy: { createdAt: "desc" },
+      orderBy: {
+        createdAt: "desc",
+      },
       skip,
       take: limit,
     }),
-    prisma.document.count({ where }),
+
+    prisma.document.count({
+      where,
+    }),
   ]);
 
-  return { documents, total };
+  return {
+    documents,
+    total,
+  };
 }
 
 async function getDocumentById(id) {

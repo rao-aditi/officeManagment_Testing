@@ -24,6 +24,7 @@ const listDocuments = async (req, res) => {
     } = req.query;
 
     const { documents, total } = await documentsService.listDocuments({
+      userId: req.user.id,
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
       documentTypeId,
