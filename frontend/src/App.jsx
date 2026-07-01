@@ -8,7 +8,7 @@ import AppShell from "./office_Managment_Frontent/layouts/AppShell";
 import Dashboard from "./gst_Frontend/pages/Dashboard";
 import ModulePage from "./gst_Frontend/pages/ModulePage";
 import MasterDataPage from "./gst_Frontend/pages/MasterDataPage";
- 
+
 export default function App() {
   return (
     <>
@@ -19,19 +19,19 @@ export default function App() {
           <Route path="/master-data" element={<MasterDataPage />} />
         </Routes>
       </BrowserRouter> */}
- 
+
       <ThemeProvider>
         <AlertProvider>
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />
- 
+
               <Route element={<ProtectedLayout />}>
                 <Route element={<AppShell />}>
                   <Route path="/*" element={<AppRoutes />} />
                 </Route>
               </Route>
- 
+
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </BrowserRouter>

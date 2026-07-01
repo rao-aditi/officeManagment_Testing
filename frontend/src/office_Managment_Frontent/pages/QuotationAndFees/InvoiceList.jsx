@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { invoiceApi } from "../../api/invoiceApi";
 import { paymentApi } from "../../api/paymentApi";
 import { useSelector, useDispatch } from "react-redux";
+import { getEnums } from "../../store/slice/auth/authSlice";
 import Card, { CardBody } from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
@@ -15,16 +16,18 @@ import Datatable from "@/office_Managment_Frontent/components/common/Datatable";
 import SearchInput from "@/office_Managment_Frontent/components/common/SearchInput";
 import { useNavigate } from "react-router-dom";
 
-const PAYMENT_MODE_OPTIONS = [
-  { value: "CASH", label: "Cash" },
-  { value: "UPI", label: "UPI" },
-  { value: "BANK_TRANSFER", label: "Bank Transfer" },
-  { value: "CHEQUE", label: "Cheque" },
-  { value: "CARD", label: "Card" },
-];
-
 const InvoiceList = () => {
-  const { userDetails } = useSelector((state) => state.auth);
+  const { userDetails, enums } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const paymentModeOptions = enums.paymentMode.map(mode => {
+    if (mode === "UPI") return { value: mode, label: "UPI" };
+    return {
+      value: mode,
+      label: mode.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' '),
+    };
+  })
+
   const isAdminUser = userDetails?.role === "ADMIN";
   const { showAlert } = useAlert();
 
@@ -58,8 +61,9 @@ const InvoiceList = () => {
   });
 
   useEffect(() => {
+    dispatch(getEnums({ invoiceStatus: true, paymentMode: true }));
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   const fetchData = async () => {
     try {
@@ -682,7 +686,7 @@ const InvoiceList = () => {
             <SelectInput
               label="Payment Mode"
               value={paymentForm.mode}
-              options={PAYMENT_MODE_OPTIONS}
+              options={paymentModeOptions}
               onChange={(val) => setPaymentForm({ ...paymentForm, mode: val })}
               required
             />

@@ -51,7 +51,7 @@ const PermissionMatrix = () => {
       } else {
         await dispatch(assignPermissionToRole(payload)).unwrap();
       }
-      await dispatch(fetchUserPermissions());
+      await dispatch(fetchUserPermissions(true));
       loadMatrix();
       showAlert({
         type: "success",

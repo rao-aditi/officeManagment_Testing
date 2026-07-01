@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -92,10 +91,7 @@ app.use(cors({
   origin: [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://office-managment-testing-nq7hac4tw-outstrip-team.vercel.app",
-    "https://office-managment-testing.vercel.app"
   ],
-
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));

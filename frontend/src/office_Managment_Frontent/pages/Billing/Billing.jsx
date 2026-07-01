@@ -17,18 +17,19 @@ import SelectInput from "../../components/ui/SelectInput";
 import { useAlert } from "../../helpers/AlertContent";
 import { getApiErrorMessage } from "../../helpers/apiError";
 
-const PAYMENT_MODE_OPTIONS = [
-  { value: "CASH", label: "Cash" },
-  { value: "UPI", label: "UPI" },
-  { value: "BANK_TRANSFER", label: "Bank Transfer" },
-  { value: "CHEQUE", label: "Cheque" },
-  { value: "CARD", label: "Card" },
-];
-
 const Billing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enums, userDetails } = useSelector((state) => state.auth);
+
+  const paymentModeOptions = enums.paymentMode.map(mode => {
+    if (mode === "UPI") return { value: mode, label: "UPI" };
+    return {
+      value: mode,
+      label: mode.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' '),
+    };
+  })
+
   const isAdmin = userDetails?.role === "ADMIN";
   const { showAlert } = useAlert();
 
@@ -57,7 +58,7 @@ const Billing = () => {
   });
 
   useEffect(() => {
-    dispatch(getEnums({ invoiceStatus: true }));
+    dispatch(getEnums({ invoiceStatus: true, paymentMode: true }));
   }, [dispatch]);
 
   const fetchBillingData = useCallback(async () => {
@@ -247,7 +248,7 @@ const Billing = () => {
                   className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${invoice.status === "PAID"
                     ? "bg-green-100 text-green-700 border-green-300"
                     : invoice.status === "OVERDUE"
-                      ? "bg-red-100 text-red-700 border-red-300"        
+                      ? "bg-red-100 text-red-700 border-red-300"
                       : invoice.status === "PARTIALLY_PAID" || invoice.status === "PARTIAL"
                         ? "bg-yellow-100 text-yellow-700 border-yellow-300"
                         : invoice.status === "SENT"
@@ -453,7 +454,7 @@ const Billing = () => {
               id="billing-payment-mode"
               label="Payment Mode"
               value={paymentForm.mode}
-              options={PAYMENT_MODE_OPTIONS}
+              options={paymentModeOptions}
               onChange={(val) => setPaymentForm({ ...paymentForm, mode: val })}
               required
             />

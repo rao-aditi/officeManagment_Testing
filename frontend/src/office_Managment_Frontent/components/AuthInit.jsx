@@ -1,18 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchUserPermissions,
-  setPermissions,
-} from "../store/slice/auth/authSlice";
+import { fetchUserPermissions } from "../store/slice/auth/authSlice";
 import Loader from "./Loader/Loader";
 
-/**
- * Syncs permissions once after login / rehydrate.
- * Skips API call when login already returned permissions (see thunk `condition`).
- */
 const AuthInit = ({ children }) => {
   const dispatch = useDispatch();
-  const { permissions, permissionsLoading, userDetails } = useSelector(
+  const { permissions, permissionsLoading } = useSelector(
     (state) => state.auth
   );
 
@@ -20,12 +13,7 @@ const AuthInit = ({ children }) => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    if (userDetails?.permissions?.length && !permissions?.length) {
-      dispatch(setPermissions(userDetails.permissions));
-      return;
-    }
-
-    dispatch(fetchUserPermissions());
+    dispatch(fetchUserPermissions(true));
   }, [dispatch]);
 
   const bootstrapping =

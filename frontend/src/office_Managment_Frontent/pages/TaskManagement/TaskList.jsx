@@ -20,7 +20,6 @@ import {
   useAlert
 } from "../../helpers/AlertContent";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import SelectInput from "../../components/ui/SelectInput";
 import Loader from "../../components/Loader/Loader";
 import TaskForm from "./TaskForm";
@@ -32,7 +31,7 @@ const isPermissionDenied = (message) =>
 
 const TaskList = () => {
   const { can } = usePermission();
-  const canCreateTask = can(PERMISSION_KEYS.CREATE_TASK);
+  const canCreateTask = can("create_task");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { showAlert } = useAlert

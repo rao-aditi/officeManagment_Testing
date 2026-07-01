@@ -1,26 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import ReportFilters from './components/ReportFilters';
-import ReportTable from './components/ReportTable';
-import { exportToExcel, exportToCSV, exportToPDF } from '../../utils/exportUtils';
+import ReportFilters from '../../components/Reports/ReportFilters';
+import ReportTable from '../../components/Reports/ReportTable';
+import { exportToExcel, exportToCSV, exportToPDF } from '../../helpers/exportUtils';
 import { fetchReportData } from '../../store/slice/reports/reportsSlice';
-
-const REPORT_TABS = [
-  { id: 'tasks', label: 'Tasks Report' },
-  { id: 'overdue', label: 'Overdue Report' },
-  { id: 'clients', label: 'Client Report' },
-  { id: 'fees', label: 'Fee Report' },
-  { id: 'invoices', label: 'Invoice Report' },
-  { id: 'payments', label: 'Payment Report' },
-  { id: 'staff-performance', label: 'Staff Performance' },
-];
+import { Filter } from "lucide-react";
+import Button from '../../components/ui/Button';
+import excelIcon from "../../assets/images/excel.png";
+import pdfIcon from "../../assets/images/pdf.png";
+import csvIcon from "../../assets/images/csv.png";
+import { usePermission } from '../../Hooks/usePermission';
 
 const COLUMNS = {
   tasks: [
     { header: 'Title', dataKey: 'title' },
     { header: 'Client', dataKey: 'client', render: (row) => row.client?.name || row.client?.businessName || '-' },
-    { header: 'Task Type', dataKey: 'taskType' },
+    { header: 'Service Type', dataKey: 'serviceType' },
     { header: 'Status', dataKey: 'status' },
     { header: 'Priority', dataKey: 'priority' },
     { header: 'Assigned To', dataKey: 'assignedTo', render: (row) => row.assignedTo?.name || '-' },
@@ -30,7 +26,7 @@ const COLUMNS = {
   overdue: [
     { header: 'Title', dataKey: 'title' },
     { header: 'Client', dataKey: 'client', render: (row) => row.client?.name || row.client?.businessName || '-' },
-    { header: 'Task Type', dataKey: 'taskType' },
+    { header: 'Service Type', dataKey: 'serviceType' },
     { header: 'Due Date', dataKey: 'dueDate', format: 'date' },
     { header: 'Assigned To', dataKey: 'assignedTo', render: (row) => row.assignedTo?.name || '-' },
   ],
@@ -62,7 +58,7 @@ const COLUMNS = {
     { header: 'Invoice No', dataKey: 'invoice', render: (row) => row.invoice?.invoiceNo || '-' },
     { header: 'Client', dataKey: 'invoice', render: (row) => row.invoice?.client?.name || '-' },
     { header: 'Amount Paid', dataKey: 'amountPaid', format: 'currency' },
-    { header: 'Mode', dataKey: 'mode' },
+    { header: 'Payment Mode', dataKey: 'mode' },
     { header: 'Status', dataKey: 'status' },
     { header: 'Payment Date', dataKey: 'paymentDate', format: 'date' },
   ],
@@ -84,12 +80,27 @@ const ReportsPage = () => {
   const activeTab = type || 'tasks';
   const { data, loading: isLoading } = useSelector((state) => state.reports);
   const [filters, setFilters] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
+
+  const { permissionsLoading, canAccessReport, getDefaultReportPath } = usePermission();
 
   useEffect(() => {
-    handleFetchReportData();
-  }, [activeTab]); // Fetch on tab change without filters
+    if (permissionsLoading) return;
+
+    if (!canAccessReport(activeTab)) {
+      const fallbackPath = getDefaultReportPath();
+      navigate(fallbackPath || '/officeManagment_DashBoard', { replace: true });
+    }
+  }, [activeTab, permissionsLoading, navigate, canAccessReport, getDefaultReportPath]);
+
+  useEffect(() => {
+    if (permissionsLoading || !canAccessReport(activeTab)) return;
+    setFilters({});
+    dispatch(fetchReportData({ reportType: activeTab, filters: {} }));
+  }, [activeTab, permissionsLoading, dispatch, canAccessReport]);
 
   const handleFetchReportData = () => {
+    if (!canAccessReport(activeTab)) return;
     dispatch(fetchReportData({ reportType: activeTab, filters }));
   };
 
@@ -102,20 +113,24 @@ const ReportsPage = () => {
   };
 
   const handleExport = (format) => {
+    if (!data || data.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
+
     const filename = `${activeTab}_report_${new Date().getTime()}`;
     const columns = COLUMNS[activeTab];
-    
-    // Flatten data for export to avoid [object Object] in Excel/CSV
+
     const flattenedData = data.map(row => {
       const newRow = {};
       columns.forEach(col => {
-         let val = row[col.dataKey];
-         if (col.render) {
-             val = col.render(row);
-         } else if (col.format === 'date' && val) {
-             val = new Date(val).toLocaleDateString();
-         }
-         newRow[col.header] = val;
+        let val = row[col.dataKey];
+        if (col.render) {
+          val = col.render(row);
+        } else if (col.format === 'date' && val) {
+          val = new Date(val).toLocaleDateString();
+        }
+        newRow[col.header] = val;
       });
       return newRow;
     });
@@ -125,61 +140,99 @@ const ReportsPage = () => {
     } else if (format === 'csv') {
       exportToCSV(flattenedData, filename);
     } else if (format === 'pdf') {
-      exportToPDF(flattenedData, columns, filename, `${REPORT_TABS.find(t => t.id === activeTab).label}`);
+      exportToPDF(flattenedData, columns, filename);
     }
   };
 
+  if (permissionsLoading || !canAccessReport(activeTab)) {
+    return null;
+  }
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="py-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Reports and Exports</h1>
           <p className="text-sm text-gray-500 mt-1">View and export various office management reports</p>
         </div>
-        
-        <div className="flex gap-2">
-          <button onClick={() => handleExport('csv')} className="px-3 py-2 bg-white border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-            CSV
-          </button>
-          <button onClick={() => handleExport('excel')} className="px-3 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors shadow-sm">
-            Excel
-          </button>
-          <button onClick={() => handleExport('pdf')} className="px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors shadow-sm">
-            PDF
-          </button>
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            leftIcon={Filter}
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            Filters
+          </Button>
+
+          <Button
+            variant="outline"
+            leftIcon={
+              <img
+                src={csvIcon}
+                alt="Excel"
+                className="w-5 h-5"
+              />
+            }
+            onClick={() => handleExport("csv")}
+          >
+            Export
+          </Button>
+
+          <Button
+            variant='outline'
+            leftIcon={
+              <img
+                src={excelIcon}
+                alt="Excel"
+                className="w-5 h-5"
+              />
+            }
+            onClick={() => handleExport("excel")}
+          >
+            Export
+          </Button>
+
+          <Button
+            variant='outline'
+            leftIcon={
+              <img
+                src={pdfIcon}
+                alt="Excel"
+                className="w-5 h-5"
+              />
+            }
+            onClick={() => handleExport("pdf")}
+          >
+            Export
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden flex">
-        {REPORT_TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setFilters({}); // Reset filters on tab switch
-              navigate(`/reports/${tab.id}`);
-            }}
-            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.id 
-                ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50' 
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div
+        className={`overflow-hidden transition-all duration-500 ease-in-out
+        ${showFilters
+            ? "max-h-[500px] opacity-100"
+            : "max-h-0 opacity-0"
+          }`}
+      >
+        <ReportFilters
+          reportType={activeTab}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onApplyFilters={() => {
+            handleFetchReportData();
+            setShowFilters(false);
+          }}
+          onClose={() => setShowFilters(false)}
+        />
       </div>
 
-      <ReportFilters 
-        reportType={activeTab}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onApplyFilters={handleFetchReportData}
-      />
-
-      <ReportTable 
-        columns={COLUMNS[activeTab]} 
-        data={data} 
-        isLoading={isLoading} 
+      <ReportTable
+        columns={COLUMNS[activeTab]}
+        data={data}
+        isLoading={isLoading}
+        pageSize={5}
       />
     </div>
   );

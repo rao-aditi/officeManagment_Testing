@@ -1,10 +1,14 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { usePermission } from "../Hooks/usePermission";
-
+import Loader from "../components/Loader/Loader";
 
 const ProtectedRoute = ({ element, permission, anyPermissions, allPermissions }) => {
-  const { can, canAny, canAll } = usePermission();
+  const { can, canAny, canAll, permissionsLoading } = usePermission();
+
+  if (permissionsLoading) {
+    return <Loader fullPage />;
+  }
 
   let allowed = true;
   if (permission) {

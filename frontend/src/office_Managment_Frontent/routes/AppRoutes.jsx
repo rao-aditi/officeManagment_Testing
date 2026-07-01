@@ -23,7 +23,6 @@ import UserForm from '../pages/UserManagement/UserForm';
 import StaffPerformance from '../pages/UserManagement/StaffPerformance';
 import PermissionMatrix from '../pages/Settings/PermissionMatrix';
 import ProtectedRoute from './ProtectedRoute';
-import { PERMISSION_KEYS } from '../helpers/permissions';
 import InvoiceDetails from '../pages/QuotationAndFees/InvoiceDetails';
 import ClientDetails from '../pages/ClientManagement/ClientDetail';
 import ProfilePage from '../pages/profile/ProfilePage';
@@ -54,21 +53,21 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<ClientList />}
             anyPermissions={[
-              PERMISSION_KEYS.VIEW_ALL_CLIENTS,
-              PERMISSION_KEYS.VIEW_ASSIGNED_CLIENTS,
+              "view_all_clients",
+              "view_assigned_clients",
             ]}
           />
         }
       />
 
       <Route
-        path= "/clients/:id"
+        path="/clients/:id"
         element={
           <ProtectedRoute
             element={<ClientDetails />}
             anyPermissions={[
-              PERMISSION_KEYS.VIEW_ALL_CLIENTS,
-              PERMISSION_KEYS.VIEW_ASSIGNED_CLIENTS,
+              "view_all_clients",
+              "view_assigned_clients",
             ]}
           />
         }
@@ -81,7 +80,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<AssignTask />}
-            permission={PERMISSION_KEYS.CREATE_TASK}
+            permission={"create_task"}
           />
         }
       />
@@ -92,8 +91,8 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<ReassignSummary />}
             anyPermissions={[
-              PERMISSION_KEYS.REASSIGN_TASK,
-              PERMISSION_KEYS.REASSIGN_TASK_WITHIN_TEAM,
+              "reassign_task",
+              "reassign_task_within_team",
             ]}
           />
         }
@@ -107,8 +106,8 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<QuotationList />}
             anyPermissions={[
-              PERMISSION_KEYS.CREATE_QUOTATION,
-              PERMISSION_KEYS.VIEW_QUOTATION,
+              "create_quotation",
+              "view_quotation",
             ]}
           />
         }
@@ -120,9 +119,9 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<ServiceTypeMaster />}
             anyPermissions={[
-              PERMISSION_KEYS.CREATE_SERVICE_TYPE,
-              PERMISSION_KEYS.UPDATE_SERVICE_TYPE,
-              PERMISSION_KEYS.CREATE_CHANGE_FEES,
+              "create_service_type",
+              "update_service_type",
+              "create_change_fees",
             ]}
           />
         }
@@ -133,7 +132,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<InvoiceList />}
-            permission={PERMISSION_KEYS.GENERATE_INVOICE}
+            permission={"generate_invoice"}
           />
         }
       />
@@ -145,7 +144,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Billing />}
-            permission={PERMISSION_KEYS.GENERATE_INVOICE}
+            permission={"generate_invoice"}
           />
         }
       />
@@ -156,11 +155,11 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<DocumentTypeMaster />}
             anyPermissions={[
-              PERMISSION_KEYS.UPLOAD_DOCUMENTS,
-              PERMISSION_KEYS.DELETE_DOCUMENTS,
-              PERMISSION_KEYS.CREATE_DOCUMENT_TYPE,
-              PERMISSION_KEYS.UPDATE_DOCUMENT_TYPE,
-              PERMISSION_KEYS.DELETE_DOCUMENT_TYPE,
+              "upload_documents",
+              "delete_documents",
+              "create_document_type",
+              "update_document_type",
+              "delete_document_type",
             ]}
           />
         }
@@ -172,8 +171,8 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<DocumentCenter />}
             anyPermissions={[
-              PERMISSION_KEYS.UPLOAD_DOCUMENTS,
-              PERMISSION_KEYS.DELETE_DOCUMENTS,
+              "upload_documents",
+              "delete_documents",
             ]}
           />
         }
@@ -184,7 +183,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<DynamicMessaging />}
-            permission={PERMISSION_KEYS.SEND_CLIENT_MESSAGES}
+            permission={"send_client_messages"}
           />
         }
       />
@@ -193,7 +192,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<NotificationLink />}
-            permission={PERMISSION_KEYS.SEND_CLIENT_MESSAGES}
+            permission={"send_client_messages"}
           />
         }
       />
@@ -204,8 +203,8 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<UserList />}
             anyPermissions={[
-              PERMISSION_KEYS.LIST_USERS,
-              PERMISSION_KEYS.CREATE_USER,
+              "list_users",
+              "create_user",
             ]}
           />
         }
@@ -215,7 +214,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<UserForm />}
-            permission={PERMISSION_KEYS.CREATE_USER}
+            permission={"create_user"}
           />
         }
       />
@@ -225,8 +224,8 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={<UserForm />}
             anyPermissions={[
-              PERMISSION_KEYS.CREATE_USER,
-              PERMISSION_KEYS.LIST_USERS,
+              "create_user",
+              "list_users",
             ]}
           />
         }
@@ -238,23 +237,20 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<PermissionMatrix />}
-            permission={PERMISSION_KEYS.VIEW_AUDIT_LOGS}
+            permission={"view_audit_logs"}
           />
         }
       />
 
-      <Route
-        path="/reports"
-        element={<Navigate to="/reports/tasks" replace />}
-      />
       <Route
         path="/reports/:type"
         element={
           <ProtectedRoute
             element={<ReportsPage />}
             anyPermissions={[
-              PERMISSION_KEYS.VIEW_REPORTS,
-              PERMISSION_KEYS.VIEW_ALL_REPORTS
+              "view_all_reports",
+              "view_operational_reports",
+              "view_own_reports",
             ]}
           />
         }

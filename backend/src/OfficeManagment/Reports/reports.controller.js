@@ -1,4 +1,6 @@
 const prisma = require("../../shared/prisma");
+const reportsService = require("./reports.service");
+const { assertCanAccessReport, REPORT_TYPES } = require("./report.permissions");
 
 // Helper for parsing dates
 const parseDateRange = (startDate, endDate) => {
@@ -14,9 +16,11 @@ const parseDateRange = (startDate, endDate) => {
 
 exports.getTaskReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.TASKS);
     const { startDate, endDate, clientId, taskType, status, assignedToId, priority } = req.query;
-    
-    const where = {};
+
+    const where = reportsService.buildTaskWhere(req.user);
+
     if (startDate || endDate) {
       where.createdAt = parseDateRange(startDate, endDate);
     }
@@ -45,19 +49,21 @@ exports.getTaskReport = async (req, res, next) => {
 
 exports.getOverdueReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.OVERDUE);
     const { startDate, endDate, assignedToId, clientId, taskType } = req.query;
-    
+
     const where = {
-      status: 'OVERDUE'
+      ...reportsService.buildTaskWhere(req.user),
+      status: "OVERDUE",
     };
-    
+
     if (startDate || endDate) {
       where.dueDate = parseDateRange(startDate, endDate);
     } else {
       // If no date provided, get all overdue up to today
       where.dueDate = { lt: new Date() };
     }
-    
+
     if (assignedToId) where.assignedToId = assignedToId;
     if (clientId) where.client_Id = parseInt(clientId, 10);
     if (taskType) where.taskType = taskType;
@@ -66,6 +72,7 @@ exports.getOverdueReport = async (req, res, next) => {
       where,
       include: {
         client: true,
+        serviceType: true,
         assignedTo: { select: { id: true, name: true, email: true } },
       },
       orderBy: { dueDate: 'desc' }
@@ -79,16 +86,15 @@ exports.getOverdueReport = async (req, res, next) => {
 
 exports.getClientReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.CLIENTS);
     const { status, city, company, startDate, endDate } = req.query;
-    
+
     const where = {};
     if (status) where.status = status;
     if (company) where.businessName = { contains: company, mode: 'insensitive' };
     if (startDate || endDate) {
       where.createdAt = parseDateRange(startDate, endDate);
     }
-    
-    // city filter might be mapped to address or other fields in actual DB, we use basic fields here
     // based on schema: businessName, name, etc.
 
     const clients = await prisma.client.findMany({
@@ -104,11 +110,12 @@ exports.getClientReport = async (req, res, next) => {
 
 exports.getFeeReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.FEES);
     const { status, minAmount, maxAmount } = req.query;
-    
+
     const where = {};
     if (status) where.status = status;
-    
+
     if (minAmount || maxAmount) {
       where.serviceCharges = {};
       if (minAmount) where.serviceCharges.gte = parseFloat(minAmount);
@@ -128,15 +135,16 @@ exports.getFeeReport = async (req, res, next) => {
 
 exports.getInvoiceReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.INVOICES);
     const { status, startDate, endDate, clientId, minAmount, maxAmount } = req.query;
-    
+
     const where = {};
     if (status) where.status = status;
     if (startDate || endDate) {
       where.issuedAt = parseDateRange(startDate, endDate);
     }
     if (clientId) where.clientId = parseInt(clientId, 10);
-    
+
     if (minAmount || maxAmount) {
       where.total = {};
       if (minAmount) where.total.gte = parseFloat(minAmount);
@@ -160,8 +168,9 @@ exports.getInvoiceReport = async (req, res, next) => {
 
 exports.getPaymentReport = async (req, res, next) => {
   try {
+    assertCanAccessReport(req.user, REPORT_TYPES.PAYMENTS);
     const { mode, startDate, endDate, status } = req.query;
-    
+
     const where = {};
     if (mode) where.mode = mode;
     if (status) where.status = status;
@@ -187,9 +196,10 @@ exports.getPaymentReport = async (req, res, next) => {
 
 exports.getStaffPerformanceReport = async (req, res, next) => {
   try {
-    // This aggregates user task data
+    assertCanAccessReport(req.user, REPORT_TYPES.STAFF_PERFORMANCE);
+
     const users = await prisma.user.findMany({
-      where: { roleRef: { name: { not: 'Admin' } } }, // adjust role names as needed
+      where: reportsService.buildStaffWhere(req.user),
       select: {
         id: true,
         name: true,
@@ -211,7 +221,7 @@ exports.getStaffPerformanceReport = async (req, res, next) => {
       const completedTasks = tasks.filter(t => t.status === 'COMPLETED');
       const overdueTasks = tasks.filter(t => t.status === 'OVERDUE' || (t.dueDate && t.dueDate < new Date() && t.status !== 'COMPLETED'));
       const rejectedTasks = tasks.filter(t => t.status === 'REJECTED');
-      
+
       let avgCompletionTimeHours = 0;
       if (completedTasks.length > 0) {
         const totalHours = completedTasks.reduce((acc, t) => {

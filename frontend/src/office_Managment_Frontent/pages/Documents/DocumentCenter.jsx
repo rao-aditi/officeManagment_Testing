@@ -22,7 +22,6 @@ import SelectInput from "../../components/ui/SelectInput";
 import Loader from "@/office_Managment_Frontent/components/Loader/Loader";
 import { useAlert } from "../../helpers/AlertContent";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import {
   fetchDocuments,
   fetchDocumentStats,
@@ -133,8 +132,8 @@ const DocumentCenter = () => {
   const dispatch = useDispatch();
   const { showAlert } = useAlert();
   const { can } = usePermission();
-  const canUpload = can(PERMISSION_KEYS.UPLOAD_DOCUMENTS);
-  const canDelete = can(PERMISSION_KEYS.DELETE_DOCUMENTS);
+  const canUpload = can("upload_documents");
+  const canDelete = can("delete_documents");
 
   const { documents, stats, pagination, loading, deleting } = useSelector(
     (state) => state.documents

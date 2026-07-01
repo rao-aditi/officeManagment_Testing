@@ -12,17 +12,14 @@ import { Phone, Mail, FileText, CreditCard } from "lucide-react";
 import TaskForm from "../TaskManagement/TaskForm";
 import { getEnums } from "../../store/slice/auth/authSlice";
 import { fetchServiceTypes } from "../../store/slice/serviceType/serviceTypeSlice";
-import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import Loader from "@/office_Managment_Frontent/components/Loader/Loader";
 
 const ClientList = () => {
-  const { can } = usePermission();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { clients, pagination, loading } = useSelector((state) => state.clients);
   const { enums } = useSelector((state) => state.auth);
-  const { list: serviceTypes, serviceTypesLoading } = useSelector(
+  const { list: serviceTypes} = useSelector(
     (state) => state.serviceTypes
   );
   const [searchTerm, setSearchTerm] = useState("");

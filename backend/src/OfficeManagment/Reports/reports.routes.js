@@ -1,4 +1,6 @@
-const express = require('express');
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+const { checkAnyPermission } = require("../middleware/rbac");
 const {
   getTaskReport,
   getOverdueReport,
@@ -7,20 +9,58 @@ const {
   getInvoiceReport,
   getPaymentReport,
   getStaffPerformanceReport,
-} = require('./reports.controller');
+} = require("./reports.controller");
 
 const router = express.Router();
 
-// You can add your JWT authentication and role checking middleware here
-// e.g., router.use(verifyToken);
-// e.g., router.use(authorizeRole(['Admin', 'Team Leader']));
+router.use(authenticate);
 
-router.get('/tasks', getTaskReport);
-router.get('/overdue', getOverdueReport);
-router.get('/clients', getClientReport);
-router.get('/fees', getFeeReport);
-router.get('/invoices', getInvoiceReport);
-router.get('/payments', getPaymentReport);
-router.get('/staff-performance', getStaffPerformanceReport);
+const anyReportAccess = checkAnyPermission(
+  "view_all_reports",
+  "view_operational_reports",
+  "view_own_reports"
+);
+
+router.get(
+  "/tasks",
+  anyReportAccess,
+  getTaskReport
+);
+
+router.get(
+  "/overdue",
+  checkAnyPermission("view_all_reports", "view_operational_reports"),
+  getOverdueReport
+);
+
+router.get(
+  "/clients",
+  checkAnyPermission("view_all_reports"),
+  getClientReport
+);
+
+router.get(
+  "/fees",
+  checkAnyPermission("view_all_reports"),
+  getFeeReport
+);
+
+router.get(
+  "/invoices",
+  checkAnyPermission("view_all_reports"),
+  getInvoiceReport
+);
+
+router.get(
+  "/payments",
+  checkAnyPermission("view_all_reports"),
+  getPaymentReport
+);
+
+router.get(
+  "/staff-performance",
+  checkAnyPermission("view_all_reports", "view_operational_reports"),
+  getStaffPerformanceReport
+);
 
 module.exports = router;

@@ -24,7 +24,6 @@ import { ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import { useAlert } from "../../helpers/AlertContent";
 import { formatDateTime, toIsoDateTime, getUserId, getPriorityBadge, getTaskStatusBadge } from "../../helpers/commonFunctions";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import Loader from "@/office_Managment_Frontent/components/Loader/Loader";
 import RemindersSection from "@/office_Managment_Frontent/components/TaskManagement/RemindersSection";
 import ChecklistSection from "@/office_Managment_Frontent/components/TaskManagement/ChecklistSection";
@@ -171,8 +170,8 @@ const TaskDetail = () => {
           </div>
           <div>
             {canAny([
-              PERMISSION_KEYS.REASSIGN_TASK,
-              PERMISSION_KEYS.REASSIGN_TASK_WITHIN_TEAM,
+              "reassign_task",
+              "reassign_task_within_team",
             ]) && (
                 <Button
                   variant="outline"

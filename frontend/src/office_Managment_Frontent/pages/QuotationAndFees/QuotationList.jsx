@@ -16,7 +16,6 @@ import SelectInput from "../../components/ui/SelectInput";
 import ActionButtons from "../../components/common/ActionsButtons";
 import { formatDate } from "../../helpers/commonFunctions";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 
 const QuotationList = () => {
   const dispatch = useDispatch();
@@ -171,7 +170,7 @@ const QuotationList = () => {
           if (col.id === "status") {
             const isLocked =
               q.status === "APPROVED" || q.status === "REJECTED";
-            const canEdit = can(PERMISSION_KEYS.CREATE_QUOTATION);
+            const canEdit = can("create_quotation");
             return (
               <td key={col.id} className="px-4 py-3">
                 {isLocked || !canEdit ? (
@@ -194,7 +193,7 @@ const QuotationList = () => {
           }
           if (col.id === "action") {
             const isLocked = q.status === "APPROVED" || q.status === "REJECTED";
-            const canEdit = can(PERMISSION_KEYS.CREATE_QUOTATION);
+            const canEdit = can("create_quotation");
             return (
               <td key={col.id} className="px-4 py-3">
                 {!isLocked && canEdit && (
@@ -232,7 +231,7 @@ const QuotationList = () => {
               </p>
             </div>
 
-            {can(PERMISSION_KEYS.CREATE_QUOTATION) && (
+            {can("create_quotation") && (
               <button
                 onClick={() => setModalOpen(true)}
                 className="bg-white text-cyanDark hover:bg-gray-100 font-semibold px-4 py-2 rounded-xl transition-all duration-200 shadow flex items-center gap-2 text-sm"

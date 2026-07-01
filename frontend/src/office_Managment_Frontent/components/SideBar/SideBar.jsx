@@ -21,8 +21,7 @@
 // import { useNavigate, useLocation } from "react-router-dom";
 // import { HiUserCircle } from "react-icons/hi2";
 // import { usePermission } from "../../Hooks/usePermission";
-// import { PERMISSION_KEYS } from "../../helpers/permissions";
-
+// 
 // const canSee = (canAny, anyPermissions) =>
 //   !anyPermissions?.length || canAny(anyPermissions);
 
@@ -43,8 +42,8 @@
 //       path: "/clients",
 //       icon: <Users size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.VIEW_ALL_CLIENTS,
-//         PERMISSION_KEYS.VIEW_ASSIGNED_CLIENTS,
+//         "view_all_clients",
+//         "view_assigned_clients",
 //       ],
 //     },
 //     {
@@ -56,50 +55,50 @@
 //       label: "User Management",
 //       path: "/users",
 //       icon: <HiUserCircle size={20} />,
-//       anyPermissions: [PERMISSION_KEYS.LIST_USERS, PERMISSION_KEYS.CREATE_USER],
+//       anyPermissions: ["list_users", "create_user"],
 //     },
 //     {
 //       label: "Due Date Reminder",
 //       path: "/due-date-reminder",
 //       icon: <CalendarClock size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.VIEW_ALL_TASKS,
-//         PERMISSION_KEYS.VIEW_OWN_TASKS,
-//         PERMISSION_KEYS.REQUEST_DUE_DATE_CHANGE,
-//         PERMISSION_KEYS.CHANGE_DUE_DATE,
+//         "view_all_tasks",
+//         "view_own_tasks",
+//         "request_due_date_change",
+//         "change_due_date",
 //       ],
 //     },
 //     {
 //       label: "Task Management",
 //       icon: <ClipboardCheck size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.VIEW_ALL_TASKS,
-//         PERMISSION_KEYS.VIEW_OWN_TASKS,
-//         PERMISSION_KEYS.CREATE_TASK,
+//         "view_all_tasks",
+//         "view_own_tasks",
+//         "create_task",
 //       ],
 //       subItems: [
 //         {
 //           label: "All Tasks",
 //           path: "/tasks",
 //           anyPermissions: [
-//             PERMISSION_KEYS.VIEW_ALL_TASKS,
-//             PERMISSION_KEYS.VIEW_OWN_TASKS,
+//             "view_all_tasks",
+//             "view_own_tasks",
 //           ],
 //         },
 //         {
 //           label: "Task Completion",
 //           path: "/task-completion",
 //           anyPermissions: [
-//             PERMISSION_KEYS.MARK_TASK_COMPLETE,
-//             PERMISSION_KEYS.UPDATE_TASK_STATUS,
+//             "mark_task_complete",
+//             "update_task_status",
 //           ],
 //         },
 //         {
 //           label: "Reassign Summary",
 //           path: "/reassign-summary",
 //           anyPermissions: [
-//             PERMISSION_KEYS.REASSIGN_TASK,
-//             PERMISSION_KEYS.REASSIGN_TASK_WITHIN_TEAM,
+//             "reassign_task",
+//             "reassign_task_within_team",
 //           ],
 //         },
 //       ],
@@ -108,29 +107,29 @@
 //       label: "Quotation & Fees",
 //       icon: <ReceiptIndianRupee size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.CREATE_QUOTATION,
-//         PERMISSION_KEYS.VIEW_QUOTATION,
-//         PERMISSION_KEYS.CREATE_CHANGE_FEES,
-//         PERMISSION_KEYS.GENERATE_INVOICE,
+//         "create_quotation",
+//         "view_quotation",
+//         "create_change_fees",
+//         "generate_invoice",
 //       ],
 //       subItems: [
 //         {
 //           label: "Quotation",
 //           path: "/quotation",
 //           anyPermissions: [
-//             PERMISSION_KEYS.CREATE_QUOTATION,
-//             PERMISSION_KEYS.VIEW_QUOTATION,
+//             "create_quotation",
+//             "view_quotation",
 //           ],
 //         },
 //         {
 //           label: "Fees",
 //           path: "/fees",
-//           anyPermissions: [PERMISSION_KEYS.CREATE_CHANGE_FEES],
+//           anyPermissions: ["create_change_fees"],
 //         },
 //         {
 //           label: "Invoices",
 //           path: "/invoice",
-//           anyPermissions: [PERMISSION_KEYS.GENERATE_INVOICE],
+//           anyPermissions: ["generate_invoice"],
 //         },
 //       ],
 //     },
@@ -138,31 +137,31 @@
 //       label: "Billing",
 //       path: "/billing",
 //       icon: <FileText size={20} />,
-//       anyPermissions: [PERMISSION_KEYS.GENERATE_INVOICE],
+//       anyPermissions: ["generate_invoice"],
 //     },
 //     {
 //       label: "Document Center",
 //       path: "/documents",
 //       icon: <FileWarning size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.UPLOAD_DOCUMENTS,
-//         PERMISSION_KEYS.DELETE_DOCUMENTS,
+//         "upload_documents",
+//         "delete_documents",
 //       ],
 //     },
 //     {
 //       label: "Client Messaging",
 //       icon: <MessageSquareMore size={20} />,
-//       anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
+//       anyPermissions: ["send_client_messages"],
 //       subItems: [
 //         {
 //           label: "Dynamic Messaging",
 //           path: "/dynamic-messaging",
-//           anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
+//           anyPermissions: ["send_client_messages"],
 //         },
 //         {
 //           label: "Notification Link",
 //           path: "/notification-link",
-//           anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
+//           anyPermissions: ["send_client_messages"],
 //         },
 //       ],
 //     },
@@ -170,48 +169,48 @@
 //       label: "Reports",
 //       icon: <BarChart3 size={20} />,
 //       anyPermissions: [
-//         PERMISSION_KEYS.VIEW_ALL_REPORTS,
-//         PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
-//         PERMISSION_KEYS.VIEW_OWN_REPORTS,
+//         "view_all_reports",
+//         "view_operational_reports",
+//         "view_own_reports",
 //       ],
 //       subItems: [
 //         {
 //           label: "Task Report",
 //           path: "/reports/tasks",
 //           anyPermissions: [
-//             PERMISSION_KEYS.VIEW_ALL_REPORTS,
-//             PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+//             "view_all_reports",
+//             "view_operational_reports",
 //           ],
 //         },
 //         {
 //           label: "Overdue Report",
 //           path: "/reports/overdue",
 //           anyPermissions: [
-//             PERMISSION_KEYS.VIEW_ALL_REPORTS,
-//             PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+//             "view_all_reports",
+//             "view_operational_reports",
 //           ],
 //         },
 //         {
 //           label: "Client Report",
 //           path: "/reports/clients",
-//           anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+//           anyPermissions: ["view_all_reports"],
 //         },
 //         {
 //           label: "Invoice Report",
 //           path: "/reports/invoices",
-//           anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+//           anyPermissions: ["view_all_reports"],
 //         },
 //         {
 //           label: "Payment Report",
 //           path: "/reports/payments",
-//           anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+//           anyPermissions: ["view_all_reports"],
 //         },
 //         {
 //           label: "Staff Performance",
 //           path: "/reports/staff-performance",
 //           anyPermissions: [
-//             PERMISSION_KEYS.VIEW_ALL_REPORTS,
-//             PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+//             "view_all_reports",
+//             "view_operational_reports",
 //           ],
 //         },
 //       ],
@@ -220,7 +219,7 @@
 //       label: "Permission Matrix",
 //       path: "/settings/permissions",
 //       icon: <ShieldCheck size={20} />,
-//       anyPermissions: [PERMISSION_KEYS.VIEW_AUDIT_LOGS],
+//       anyPermissions: ["view_audit_logs"],
 //     },
 //     {
 //       label: "Notifications",
@@ -370,7 +369,6 @@ import { IoDocumentsOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiUserCircle } from "react-icons/hi2";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 
 const canSee = (canAny, anyPermissions) =>
   !anyPermissions?.length || canAny(anyPermissions);
@@ -395,58 +393,58 @@ const SideBar = ({ isCollapsed }) => {
       path: "/clients",
       icon: <Users size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.VIEW_ALL_CLIENTS,
-        PERMISSION_KEYS.VIEW_ASSIGNED_CLIENTS,
+        "view_all_clients",
+        "view_assigned_clients",
       ],
     },
     {
       label: "User Management",
       path: "/users",
       icon: <HiUserCircle size={20} />,
-      anyPermissions: [PERMISSION_KEYS.LIST_USERS, PERMISSION_KEYS.CREATE_USER],
+      anyPermissions: ["list_users", "create_user"],
     },
     {
       label: "Due Date Reminder",
       path: "/due-date-reminder",
       icon: <CalendarClock size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.VIEW_ALL_TASKS,
-        PERMISSION_KEYS.VIEW_OWN_TASKS,
-        PERMISSION_KEYS.REQUEST_DUE_DATE_CHANGE,
-        PERMISSION_KEYS.CHANGE_DUE_DATE,
+        "view_all_tasks",
+        "view_own_tasks",
+        "request_due_date_change",
+        "change_due_date",
       ],
     },
     {
       label: "Task Management",
       icon: <ClipboardCheck size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.VIEW_ALL_TASKS,
-        PERMISSION_KEYS.VIEW_OWN_TASKS,
-        PERMISSION_KEYS.CREATE_TASK,
+        "view_all_tasks",
+        "view_own_tasks",
+        "create_task",
       ],
       subItems: [
         {
-          label: can(PERMISSION_KEYS.VIEW_ALL_TASKS) ? "All Tasks" : "My Tasks",
+          label: can("view_all_tasks") ? "All Tasks" : "My Tasks",
           path: "/tasks",
           anyPermissions: [
-            PERMISSION_KEYS.VIEW_ALL_TASKS,
-            PERMISSION_KEYS.VIEW_OWN_TASKS,
+            "view_all_tasks",
+            "view_own_tasks",
           ],
         },
         {
           label: "Task Completion",
           path: "/task-completion",
           anyPermissions: [
-            PERMISSION_KEYS.MARK_TASK_COMPLETE,
-            PERMISSION_KEYS.UPDATE_TASK_STATUS,
+            "mark_task_complete",
+            "update_task_status",
           ],
         },
         {
           label: "Reassign Summary",
           path: "/reassign-summary",
           anyPermissions: [
-            PERMISSION_KEYS.REASSIGN_TASK,
-            PERMISSION_KEYS.REASSIGN_TASK_WITHIN_TEAM,
+            "reassign_task",
+            "reassign_task_within_team",
           ],
         },
       ],
@@ -455,33 +453,33 @@ const SideBar = ({ isCollapsed }) => {
       label: "Quotation & Fees",
       icon: <ReceiptIndianRupee size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.CREATE_QUOTATION,
-        PERMISSION_KEYS.VIEW_QUOTATION,
-        PERMISSION_KEYS.CREATE_CHANGE_FEES,
-        PERMISSION_KEYS.GENERATE_INVOICE,
+        "create_quotation",
+        "view_quotation",
+        "create_change_fees",
+        "generate_invoice",
       ],
       subItems: [
         {
           label: "Service Fees",
           path: "/service-types",
           anyPermissions: [
-            PERMISSION_KEYS.CREATE_CHANGE_FEES,
-            PERMISSION_KEYS.CREATE_SERVICE_TYPE,
-            PERMISSION_KEYS.UPDATE_SERVICE_TYPE,
+            "create_change_fees",
+            "create_service_type",
+            "update_service_type",
           ],
         },
         {
           label: "Quotation",
           path: "/quotation",
           anyPermissions: [
-            PERMISSION_KEYS.CREATE_QUOTATION,
-            PERMISSION_KEYS.VIEW_QUOTATION,
+            "create_quotation",
+            "view_quotation",
           ],
         },
         {
           label: "Invoices",
           path: "/invoice",
-          anyPermissions: [PERMISSION_KEYS.GENERATE_INVOICE],
+          anyPermissions: ["generate_invoice"],
         },
       ],
     },
@@ -489,14 +487,14 @@ const SideBar = ({ isCollapsed }) => {
       label: "Billing",
       path: "/billing",
       icon: <ReceiptIndianRupee size={20} />,
-      anyPermissions: [PERMISSION_KEYS.GENERATE_INVOICE],
+      anyPermissions: ["generate_invoice"],
     },
     {
       label: "Documents",
       icon: <IoDocumentsOutline size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.UPLOAD_DOCUMENTS,
-        PERMISSION_KEYS.DELETE_DOCUMENTS,
+        "upload_documents",
+        "delete_documents",
       ],
       subItems: [
         {
@@ -510,78 +508,83 @@ const SideBar = ({ isCollapsed }) => {
       ]
     },
     {
-      label: "Client Messaging",
-      icon: <MessageSquareMore size={20} />,
-      anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
-      subItems: [
-        {
-          label: "Dynamic Messaging",
-          path: "/dynamic-messaging",
-          anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
-        },
-        {
-          label: "Notification Link",
-          path: "/notification-link",
-          anyPermissions: [PERMISSION_KEYS.SEND_CLIENT_MESSAGES],
-        },
-      ],
-    },
-    {
       label: "Reports",
       icon: <BarChart3 size={20} />,
       anyPermissions: [
-        PERMISSION_KEYS.VIEW_ALL_REPORTS,
-        PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
-        PERMISSION_KEYS.VIEW_OWN_REPORTS,
+        "view_all_reports",
+        "view_operational_reports",
+        "view_own_reports",
       ],
       subItems: [
         {
           label: "Task Report",
           path: "/reports/tasks",
           anyPermissions: [
-            PERMISSION_KEYS.VIEW_ALL_REPORTS,
-            PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+            "view_all_reports",
+            "view_operational_reports",
+            "view_own_reports",
           ],
         },
         {
           label: "Overdue Report",
           path: "/reports/overdue",
           anyPermissions: [
-            PERMISSION_KEYS.VIEW_ALL_REPORTS,
-            PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+            "view_all_reports",
+            "view_operational_reports",
+            "view_own_reports",
           ],
         },
         {
           label: "Client Report",
           path: "/reports/clients",
-          anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+          anyPermissions: ["view_all_reports"],
         },
         {
           label: "Invoice Report",
           path: "/reports/invoices",
-          anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+          anyPermissions: ["view_all_reports"],
         },
         {
           label: "Payment Report",
           path: "/reports/payments",
-          anyPermissions: [PERMISSION_KEYS.VIEW_ALL_REPORTS],
+          anyPermissions: ["view_all_reports"],
         },
         {
           label: "Staff Performance",
           path: "/reports/staff-performance",
           anyPermissions: [
-            PERMISSION_KEYS.VIEW_ALL_REPORTS,
-            PERMISSION_KEYS.VIEW_OPERATIONAL_REPORTS,
+            "view_all_reports",
+            "view_operational_reports",
           ],
         },
       ],
     },
+
+    {
+      label: "Client Messaging",
+      icon: <MessageSquareMore size={20} />,
+      anyPermissions: ["send_client_messages"],
+      subItems: [
+        {
+          label: "Dynamic Messaging",
+          path: "/dynamic-messaging",
+          anyPermissions: ["send_client_messages"],
+        },
+        {
+          label: "Notification Link",
+          path: "/notification-link",
+          anyPermissions: ["send_client_messages"],
+        },
+      ],
+    },
+
     // {
     //   label: "Permission Matrix",
     //   path: "/settings/permissions",
     //   icon: <ShieldCheck size={20} />,
-    //   anyPermissions: [PERMISSION_KEYS.VIEW_AUDIT_LOGS],
+    //   anyPermissions: ["view_audit_logs"],
     // },
+
     {
       label: "Notifications",
       path: "/notifications",
@@ -725,7 +728,8 @@ const SideBar = ({ isCollapsed }) => {
                     toggleMenu(item.label);
                   } else if (!hasSubItems) {
                     handleNavigation(item.path);
-                  }}}
+                  }
+                }}
                 onMouseEnter={() => isCollapsed && hasSubItems && setHoveredMenu(item.label)}
                 onMouseLeave={() => setHoveredMenu(null)}
                 className={`

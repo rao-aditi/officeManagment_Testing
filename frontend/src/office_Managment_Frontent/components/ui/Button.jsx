@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 
 const CustomButton = ({
   children,
@@ -13,7 +13,7 @@ const CustomButton = ({
   styleClass = "",
 }) => {
   const base = `
-    inline-flex items-center justify-center gap-1
+    inline-flex items-center justify-center gap-2
     rounded-md
     font-medium
     transition-all duration-200
@@ -44,7 +44,6 @@ const CustomButton = ({
     success:
       "bg-green-600 text-white hover:bg-green-700",
 
-
     "success-outline":
       "text-green-700 border border-green-700 bg-transparent hover:bg-green-700 hover:text-white",
 
@@ -53,7 +52,6 @@ const CustomButton = ({
 
     "danger-outline":
       "text-red-600 border border-red-600 bg-transparent hover:bg-red-600 hover:text-white",
-
   };
 
   const disabledStyles = disabled
@@ -67,9 +65,21 @@ const CustomButton = ({
       disabled={disabled}
       className={`${base} ${sizes[size]} ${variants[variant]} ${disabledStyles}`}
     >
-      {LeftIcon && <LeftIcon size={iconSize || iconSizes[size]} />}
+      {LeftIcon &&
+        (React.isValidElement(LeftIcon) ? (
+          LeftIcon
+        ) : (
+          <LeftIcon size={iconSize || iconSizes[size]} />
+        ))}
+
       {children}
-      {RightIcon && <RightIcon size={iconSize || iconSizes[size]} />}
+
+      {RightIcon &&
+        (React.isValidElement(RightIcon) ? (
+          RightIcon
+        ) : (
+          <RightIcon size={iconSize || iconSizes[size]} />
+        ))}
     </button>
   );
 };

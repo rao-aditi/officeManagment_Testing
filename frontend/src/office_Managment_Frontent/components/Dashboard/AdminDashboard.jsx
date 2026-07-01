@@ -7,6 +7,8 @@ import { invoiceApi } from '../../api/invoiceApi';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Loader from '../Loader/Loader';
 import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEnums } from '../../store/slice/auth/authSlice';
 
 const StatCard = ({ title, value, icon: Icon, color, trend }) => (
     <Card className="hover:shadow-lg transition-shadow">
@@ -44,11 +46,15 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [taskData, setTaskData] = useState([]);
     const [invoiceData, setInvoiceData] = useState([]);
+    const [allInvoices, setAllInvoices] = useState([]);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { enums } = useSelector((state) => state.auth);
 
     useEffect(() => {
+        dispatch(getEnums({ invoiceStatus: true }));
         fetchDashboardData();
-    }, []);
+    }, [dispatch]);
 
     const fetchDashboardData = async () => {
         try {
@@ -85,6 +91,8 @@ const AdminDashboard = () => {
 
             setRecentTasks(tasks.slice(0, 5));
 
+            setAllInvoices(invoices);
+
             // Chart data
             const taskStatusCount = {
                 'DRAFT': tasks.filter(t => t.status === 'DRAFT').length,
@@ -96,23 +104,23 @@ const AdminDashboard = () => {
             };
             setTaskData(Object.entries(taskStatusCount).map(([name, value]) => ({ name, value })));
 
-            // Invoice status chart
-            const invoiceStatusCount = {
-                'DRAFT': invoices.filter(i => i.status === 'DRAFT').length,
-                'SENT': invoices.filter(i => i.status === 'SENT').length,
-                'PAID': invoices.filter(i => i.status === 'PAID').length,
-                'PARTIALLY_PAID': invoices.filter(i => i.status === 'PARTIALLY_PAID').length,
-                'OVERDUE': invoices.filter(i => i.status === 'OVERDUE').length,
-                'CANCELLED': invoices.filter(i => i.status === 'CANCELLED').length,
-            };
-
-            setInvoiceData(Object.entries(invoiceStatusCount).map(([name, value]) => ({ name, value })));
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const invoiceStatusCount = {};
+        const statuses = enums?.invoiceStatus;
+        
+        statuses.forEach(status => {
+            invoiceStatusCount[status] = allInvoices.filter(i => i.status === status).length;
+        });
+
+        setInvoiceData(Object.entries(invoiceStatusCount).map(([name, value]) => ({ name, value })));
+    }, [allInvoices, enums?.invoiceStatus]);
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 

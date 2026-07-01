@@ -10,7 +10,6 @@ import {
   toLocalDateTimeInput,
 } from "../../helpers/commonFunctions";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import ApproveRejectModel from "../common/ApproveRejectModel";
 
 const TaskAttributesSection = ({
@@ -62,13 +61,13 @@ const TaskAttributesSection = ({
     isAssignee &&
     ["ASSIGNED", "IN_PROGRESS", "REJECTED", "OVERDUE"].includes(task?.status);
   const showApproverActions = canAny([
-    PERMISSION_KEYS.APPROVE_TASK,
-    PERMISSION_KEYS.APPROVE_TASK_IF_ENABLED,
+    "approve_task",
+    "approve_task_if_enabled",
   ]);
   const canChangeDue =
     canAny([
-      PERMISSION_KEYS.CHANGE_DUE_DATE,
-      PERMISSION_KEYS.REQUEST_DUE_DATE_CHANGE,
+      "change_due_date",
+      "request_due_date_change",
     ]) || isAssignee;
 
   return (
@@ -113,7 +112,7 @@ const TaskAttributesSection = ({
 
           {canChangeDue &&
             !["COMPLETED", "CANCELLED"].includes(task.status) &&
-            canAny([PERMISSION_KEYS.REQUEST_DUE_DATE_CHANGE]) && (
+            canAny(["request_due_date_change"]) && (
               <div className="pt-4 border-t border-gray-100 space-y-2">
                 <span className="text-sm font-bold text-gray-500 uppercase block">
                   Adjust Due Date
@@ -200,7 +199,7 @@ const TaskAttributesSection = ({
                   </Button>
                 )}
 
-                {can(PERMISSION_KEYS.CREATE_TASK) &&
+                {can("create_task") &&
                   !["COMPLETED", "CANCELLED", "APPROVED"].includes(task.status) && (
                     <Button
                       variant="outline"

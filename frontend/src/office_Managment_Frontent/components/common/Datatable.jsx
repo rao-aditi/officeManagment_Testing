@@ -31,31 +31,34 @@ const DataTable = ({
 
   const paginationSx = {
     "& .MuiPaginationItem-root": {
-      width: "25px",
-      height: "25px",
+      width: "32px",
+      height: "32px",
       padding: 0,
-      minWidth: "25px",
-      color: "var(--color-primary)",
+      minWidth: "32px",
+      color: "#04506B",
       backgroundColor: "transparent",
-      borderColor: "var(--color-border)",
+      borderColor: "#d1d5db",
     },
     "& .MuiPaginationItem-icon": {
       fontSize: "16px",
-      color: "var(--color-muted-foreground)",
+      color: "#374151",
     },
     "& .MuiPaginationItem-root.Mui-selected": {
-      backgroundColor: "var(--color-muted)",
-      color: "var(--color-primary)",
-      border: "1px solid var(--color-primary)",
+      backgroundColor: "#f9fafb",
+      color: "#04506B",
+      border: "1px solid #04506B",
       "&:hover": {
-        backgroundColor: "var(--color-muted)",
+        backgroundColor: "#f9fafb",
       },
     },
+    "& .MuiPagination-ul": {
+      gap: 0.5,
+    },
     "& .MuiPaginationItem-root:hover": {
-      backgroundColor: "var(--color-accent)",
+      backgroundColor: "#f9fafb",
     },
     "& .MuiPaginationItem-ellipsis": {
-      color: "var(--color-muted-foreground)",
+      color: "#374151",
     },
   };
 

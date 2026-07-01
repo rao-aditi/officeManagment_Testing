@@ -15,13 +15,12 @@ import Button from "../../components/ui/Button";
 import { FileType, PlusCircle } from "lucide-react";
 import Loader from "../../components/Loader/Loader";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import DataTable from "../../components/common/Datatable";
 import ActionButtons from "../../components/common/ActionsButtons";
 import Modal from "../../components/ui/Modal";
 import { useAlert } from "@/office_Managment_Frontent/helpers/AlertContent";
 import AddEditDocumentTypeModal from "./AddEditDocumentTypeModal";
-import { getEnums, fetchUserPermissions } from "../../store/slice/auth/authSlice";
+import { getEnums } from "../../store/slice/auth/authSlice";
 
 const FREQUENCY_LABELS = {
   MONTHLY: "Monthly",
@@ -35,9 +34,9 @@ const DocumentTypeMaster = () => {
   const { showAlert } = useAlert();
   const { can } = usePermission();
 
-  const canCreate = can(PERMISSION_KEYS.CREATE_DOCUMENT_TYPE);
-  const canUpdate = can(PERMISSION_KEYS.UPDATE_DOCUMENT_TYPE);
-  const canDelete = can(PERMISSION_KEYS.DELETE_DOCUMENT_TYPE);
+  const canCreate = can("create_document_type");
+  const canUpdate = can("update_document_type");
+  const canDelete = can("delete_document_type");
 
   const [mode, setMode] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -57,7 +56,6 @@ const DocumentTypeMaster = () => {
       status: true,
       frequencyType: true
     }));
-    dispatch(fetchUserPermissions(true));
   }, [dispatch]);
 
   useEffect(() => {

@@ -49,7 +49,7 @@ export const getEnums = createAsyncThunk(
 
 export const fetchUserPermissions = createAsyncThunk(
   "auth/fetchUserPermissions",
-  async (_, { rejectWithValue, signal }) => {
+  async (force = false, { rejectWithValue, signal }) => {
     try {
       const response = await axiosInstance.get(apiEndPoints.userPermissions, {
         signal,
@@ -65,11 +65,11 @@ export const fetchUserPermissions = createAsyncThunk(
     }
   },
   {
-    condition: (_, { getState }) => {
-      const { permissionsLoading, permissions } = getState().auth;
-      if (permissionsLoading) return false;
-      if (permissions?.length > 0) return false;
-      return Boolean(localStorage.getItem("accessToken"));
+    condition: (force, { getState }) => {
+      if (!localStorage.getItem("accessToken")) return false;
+      if (force) return true;
+      const { permissionsLoading } = getState().auth;
+      return !permissionsLoading;
     },
   }
 );
@@ -118,7 +118,7 @@ const authSlice = createSlice({
       .addCase(reqToUserLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.userDetails = action.payload?.data?.user;
-        state.permissions = action.payload?.data?.user?.permissions || [];
+        state.permissions = [];
 
         const accessToken = action.payload?.data?.token?.accessToken;
         const refreshToken = action.payload?.data?.token?.refreshToken;

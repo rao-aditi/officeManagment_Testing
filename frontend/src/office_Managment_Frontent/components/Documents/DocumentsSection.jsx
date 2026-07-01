@@ -18,7 +18,6 @@ import Button from "../../components/ui/Button";
 import Loader from "@/office_Managment_Frontent/components/Loader/Loader";
 import { useAlert } from "../../helpers/AlertContent";
 import { usePermission } from "../../Hooks/usePermission";
-import { PERMISSION_KEYS } from "../../helpers/permissions";
 import { fetchDocumentTypes } from "../../store/slice/documentType/documentTypeSlice";
 import { fetchGoogleDriveStatus } from "../../store/slice/googleDrive/googleDriveSlice";
 import {
@@ -93,8 +92,8 @@ const DocumentsSection = ({ clientId, taskId, compact = false }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const canUpload = can(PERMISSION_KEYS.UPLOAD_DOCUMENTS);
-  const canDelete = can(PERMISSION_KEYS.DELETE_DOCUMENTS);
+  const canUpload = can("upload_documents");
+  const canDelete = can("delete_documents");
 
   const activeDocumentTypes = useMemo(
     () => (documentTypes || []).filter((item) => item.status === "ACTIVE"),
