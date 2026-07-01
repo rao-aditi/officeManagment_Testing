@@ -9,10 +9,10 @@ import { RiRobot2Fill } from "react-icons/ri";
 import { PiTelegramLogo } from "react-icons/pi";
 
 const API_BASE =
-    import.meta.env.VITE_SERVER_URL || "http://localhost:5002/api";
+    import.meta.env.VITE_SERVER_URL || "https://chatbot-app-t7b7.onrender.com/api";
 
 const SOCKET_URL =
-    import.meta.env.VITE_SOCKET_URL || "http://localhost:5002";
+    import.meta.env.VITE_SOCKET_URL || "https://chatbot-app-t7b7.onrender.com";
 
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
